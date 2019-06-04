@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msj.goods.mapper.PdIntegralMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.msj.goods.entity.PdIntegral">
+        <id column="behavior_id" property="behaviorId" />
+        <result column="behavior_category" property="behaviorCategory" />
+        <result column="behavior_title" property="behaviorTitle" />
+        <result column="behavior_content" property="behaviorContent" />
+        <result column="shen_qing_fang_shi" property="shenQingFangShi" />
+        <result column="type_id" property="typeId" />
+        <result column="zui_duo_integral" property="zuiDuoIntegral" />
+        <result column="zui_shao_integral" property="zuiShaoIntegral" />
+        <result column="integral_fen_ji" property="integralFenJi" />
+        <result column="yi_wan_cheng_ci_shu" property="yiWanChengCiShu" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="post_id" property="postId" />
+        <result column="dept_id" property="deptId" />
+        <result column="menu_id" property="menuId" />
+        <result column="remark" property="remark" />
+        <result property="postName"    column="post_name"    />
+        <result property="deptName"   column="dept_name"   />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        behavior_id, behavior_category, behavior_title, behavior_content, shen_qing_fang_shi, type_id, zui_duo_integral, zui_shao_integral, integral_fen_ji, yi_wan_cheng_ci_shu, status, create_time, update_time, post_id, dept_id, menu_id, remark, post_name,dept_name
+    </sql>
+    <!--查询本部门 和所有 通用的菜单项-->
+    <select id="selectDeptAndParentMenu" resultMap="BaseResultMap" >
+        select
+        behavior_id, behavior_category, behavior_title, behavior_content, shen_qing_fang_shi, type_id, zui_duo_integral, zui_shao_integral, integral_fen_ji, yi_wan_cheng_ci_shu, status, create_time, update_time, post_id, dept_id, menu_id, remark, post_name,dept_name
+        FROM
+        pd_integral
+        <where>
+           and status = 0
+            <if test="deptId !=null and deptId != ''" >
+                AND dept_id = #{deptId}
+            </if>
+            <if test="search !=null and search != ''" >
+                AND behavior_title like concat('%', #{search}, '%')
+            </if>
+        </where>
+    </select>
+</mapper>

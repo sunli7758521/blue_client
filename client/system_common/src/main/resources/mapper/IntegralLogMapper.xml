@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msj.goods.mapper.IntegralLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.msj.goods.entity.IntegralLog">
+        <id column="log_id" property="logId" />
+        <result column="approval_num" property="approvalNum" />
+        <result column="user_id" property="userId" />
+        <result column="integral_id" property="integralId" />
+        <result column="user_phone" property="userPhone" />
+        <result column="user_name" property="userName" />
+        <result column="user_img" property="userImg" />
+        <result column="user_dept" property="userDept" />
+        <result column="user_post" property="userPost" />
+        <result column="integral_title" property="integralTitle" />
+        <result column="integral_content" property="integralContent" />
+        <result column="bian_integral" property="bianIntegral" />
+        <result column="type_id" property="typeId" />
+        <result column="get_time" property="getTime" />
+        <result column="status" property="status" />
+        <result column="remark" property="remark" />
+        <result column="k_integral" property="kIntegral" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        log_id, approval_num, user_id, integral_id, user_phone, user_name, user_img, user_dept, user_post, integral_title, integral_content, bian_integral, type_id, get_time, status, remark, k_integral
+    </sql>
+
+</mapper>

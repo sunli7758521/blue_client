@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>integral_goods</artifactId>
+        <groupId>com.msj.goods</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>blue_admin</artifactId>
+    <properties>
+        <shiro.version>1.4.0</shiro.version>
+        <fastjson.version>1.2.33</fastjson.version>
+        <pagehelper.version>1.2.5</pagehelper.version>
+        <org.apache.commons.version>3.4</org.apache.commons.version>
+        <swagger2.version>2.7.0</swagger2.version>
+        <swagger2-ui.version>2.7.0</swagger2-ui.version>
+        <freemarker.version>2.3.20</freemarker.version>
+        <velocity.version>2.0</velocity.version>
+        <mysql.version>5.1.25</mysql.version>
+        <mybatis-plus.version>2.2.0</mybatis-plus.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <durid.version>1.1.9</durid.version>
+        <httpclient.version>4.5.1</httpclient.version>
+        <httpcore.version>4.4.4</httpcore.version>
+        <httpmime.version>4.3.5</httpmime.version>
+        <commons-io.version>2.4</commons-io.version>
+    </properties>
+<dependencies>
+    <!--企业自建E应用jar-->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <!--PageHelper依赖-->
+    <dependency>
+        <groupId>com.github.pagehelper</groupId>
+        <artifactId>pagehelper-spring-boot-starter</artifactId>
+    </dependency>
+
+
+    <dependency>
+        <groupId>com.github.pagehelper</groupId>
+        <artifactId>pagehelper-spring-boot-autoconfigure</artifactId>
+        <version>1.2.5</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-devtools</artifactId>
+        <optional>true</optional>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>${httpclient.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpcore</artifactId>
+        <version>${httpcore.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpmime</artifactId>
+        <version>${httpmime.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>${commons-io.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.taobao.top</groupId>
+        <artifactId>top-api-sdk-dev</artifactId>
+        <version>ding-open-mc-SNAPSHOT</version>
+        <scope>system</scope>
+        <systemPath>${pom.basedir}/src/main/resources/lib/top-api-sdk-dev-ding-open-mc-20180719.091043-1.jar</systemPath>
+    </dependency>
+
+    <dependency>
+        <groupId>com.taobao.top</groupId>
+        <artifactId>lippi-oapi-encrpt</artifactId>
+        <version>dingtalk-SNAPSHOT</version>
+        <scope>system</scope>
+        <systemPath>${pom.basedir}/src/main/resources/lib/lippi-oapi-encrpt.jar</systemPath>
+    </dependency>
+
+    <!--<dependency>
+        <groupId>com.taobao.top</groupId>
+        <artifactId>lippi-oapi-encrpt</artifactId>
+        <version>dingtalk-SNAPSHOT</version>
+        <scope>system</scope>
+        <systemPath>${pom.basedir}/src/main/resources/lib/top-api-sdk-dev-ding-open-mc-20180719.091254-2-sources.jar</systemPath>
+    </dependency>-->
+
+    <!--公共依赖-->
+    <dependency>
+        <groupId>com.msj.goods</groupId>
+        <artifactId>system_common</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <!--springboot 开发工具-->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-devtools</artifactId>
+        <optional>true</optional>
+    </dependency>
+    <!--日志依赖 -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-logging</artifactId>
+    </dependency>
+    <!--aop依赖开始 -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-aop</artifactId>
+    </dependency>
+    <!--aop依赖结束 -->
+    <!--web依赖开始 -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <!--web依赖开始 -->
+    <!--&lt;!&ndash;&lt;!&ndash;数据源依赖&ndash;&gt;-->
+    <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>druid-spring-boot-starter</artifactId>
+        <version>${durid.version}</version>
+    </dependency>
+    <!--mybatis-plus依赖-->
+
+    <dependency>
+        <groupId>net.sf.json-lib</groupId>
+        <artifactId>json-lib</artifactId>
+        <version>0.9</version>
+    </dependency>
+
+    <!-- Mysql驱动包 -->
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>${mysql.version}</version>
+    </dependency>
+    <!--mybatis_plus end -->
+    <!--swagger依赖-->
+    <dependency>
+        <groupId>io.springfox</groupId>
+        <artifactId>springfox-swagger2</artifactId>
+        <version>${swagger2.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>io.springfox</groupId>
+        <artifactId>springfox-swagger-ui</artifactId>
+        <version>${swagger2-ui.version}</version>
+    </dependency>
+    <!--PageHelper依赖-->
+    <dependency>
+        <groupId>com.github.pagehelper</groupId>
+        <artifactId>pagehelper-spring-boot-starter</artifactId>
+        <version>${pagehelper.version}</version>
+    </dependency>
+    <!--<dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+    </dependency>-->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-configuration-processor</artifactId>
+        <optional>true</optional>
+    </dependency>
+
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <optional>true</optional>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>fastjson</artifactId>
+        <version>${fastjson.version}</version>
+    </dependency>
+    <!--shiro依赖-->
+    <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-core</artifactId>
+        <version>${shiro.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-spring</artifactId>
+        <version>${shiro.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-ehcache</artifactId>
+        <version>${shiro.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>commons-fileupload</groupId>
+        <artifactId>commons-fileupload</artifactId>
+        <version>1.3.1</version>
+    </dependency>
+    <!--&lt;!&ndash;加载配置文件yml&ndash;&gt;
+    <dependency>
+        <groupId>org.yaml</groupId>
+        <artifactId>snakeyaml</artifactId>
+        <version>1.17</version>
+    </dependency>-->
+
+    <!-- 开启缓存 -->
+    <!--<dependency>-->
+        <!--<groupId>org.springframework.boot</groupId>-->
+        <!--<artifactId>spring-boot-starter-cache</artifactId>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+        <!--<groupId>net.sf.ehcache</groupId>-->
+        <!--<artifactId>ehcache</artifactId>-->
+    <!--</dependency>-->
+</dependencies>
+
+    <build>
+
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <fork>true</fork> <!-- 如果没有该配置，devtools不会生效 -->
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                    <!--根据你把lib放的位置-->
+                    <compilerArguments>
+                        <extdirs>${pom.basedir}/src/main/resources/lib</extdirs>
+                    </compilerArguments>
+                </configuration>
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources/lib</directory>
+                   <targetPath>BOOT-INF/lib/</targetPath>
+                <includes>
+                   <include>**/*.jar</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>META_INF/**</include>
+                    <include>static/**</include>
+                    <include>templates/**</include>
+                    <include>*.yml</include>
+                    <include>*.xml</include>
+                   <!-- <include>lib/*.jar</include>-->
+                </includes>
+            </resource>
+        </resources>
+    </build>
+</project>

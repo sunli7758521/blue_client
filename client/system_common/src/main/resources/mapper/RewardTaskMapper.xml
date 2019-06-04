@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msj.goods.mapper.RewardTaskMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.msj.goods.entity.RewardTask">
+        <id column="rt_id" property="rtId" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+        <result column="task_type_id" property="taskTypeId" />
+        <result column="integral_type_id" property="integralTypeId" />
+        <result column="app_way" property="appWay" />
+        <result column="task_integral" property="taskIntegral" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="people_num" property="peopleNum" />
+        <result column="sort" property="sort" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="dept_id" property="deptId" />
+        <result column="remark" property="remark" />
+        <result column="release_user_id" property="releaseUserId" />
+        <result column="role_ids" property="roleIds" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        rt_id, title, content, task_type_id, integral_type_id, app_way, task_integral, start_time, end_time, people_num, sort, status, create_time, update_time, dept_id, remark, release_user_id, role_ids
+    </sql>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_List">
+        reward_task.rt_id  as rtId, reward_task.title as title,
+        reward_task.content as content,
+        reward_task.task_type_id as taskTypeId,
+        reward_task.integral_type_id as integralTypeId,
+        reward_task.app_way as appWay,
+        reward_task.task_integral as taskIntegral,
+        reward_task.start_time as startTime,
+        reward_task.end_time as endTime,
+        reward_task.people_num as peopleNum,
+        reward_task.sort as sort,
+        reward_task.status as status,
+        reward_task.create_time as createTime,
+        reward_task.update_time as updateTime,
+        reward_task.dept_id as deptId,
+        reward_task.remark as remark,
+        reward_task.release_user_id as releaseUserId,
+        reward_task.role_ids as roleIds
+    </sql>
+    <!--日常任务 抢单任务 挑战任务-->
+    <select id="selectTask" resultType="com.msj.goods.entity.TashAndUser" >
+      select
+      <include refid="Base_List" />
+        from reward_task,reward_task_dept
+        where reward_task.rt_id = reward_task_dept.rt_id
+        and  reward_task.status in(0,2)  and  reward_task.task_type_id = #{times}
+        AND  (reward_task_dept.d_id = #{deptId} or  reward_task.role_ids LIKE concat(concat('%',#{roleId}),'%'))
+    </select>
+    <!-- 悬赏任务 显示数量 日常任务，抢单，挑战  -->
+    <select id="selectCountTaskDeptNum" resultType="int" >
+      SELECT count(1) FROM reward_task,reward_task_dept where reward_task.rt_id = reward_task_dept.rt_id
+       and reward_task.status =0
+          AND reward_task_dept.d_id = #{deptId}
+          or  reward_task.role_ids LIKE concat(concat('%',#{roleId}),'%')
+
+    </select>
+    <!-- 通过部门id 关联查询发布任务的状态 -->
+    <select id="selectTaskStatus" resultMap="BaseResultMap" >
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM reward_task,reward_task_dept where reward_task.rt_id = reward_task_dept.rt_id
+        <if test="deptId !=null and deptId !=''" >
+            AND reward_task_dept.d_id = #{deptId}
+        </if>
+    </select>
+    <!-- 查询当日常的任务 -->
+    <select id="selectDayTask"  resultType="com.msj.goods.entity.TashAndUser" >
+        select
+        <include refid="Base_List" />
+        from reward_task,reward_task_dept
+        where reward_task.rt_id = reward_task_dept.rt_id
+        and  reward_task.status in(0,2)   and  reward_task.task_type_id =#{times}
+        and  (reward_task_dept.d_id = #{deptId}  or  reward_task.role_ids LIKE concat(concat('%',#{roleId}),'%'))
+        AND TO_DAYS(reward_task.create_time) = TO_DAYS(NOW())
+    </select>
+
+
+</mapper>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msj.goods.mapper.IntegralMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.msj.goods.entity.Integral">
+        <id column="integral_id" property="integralId" />
+        <result column="user_id" property="userId" />
+        <result column="user_name" property="userName" />
+        <result column="user_phone" property="userPhone" />
+        <result column="count_integral" property="countIntegral" />
+        <result column="del_integral" property="delIntegral" />
+        <result column="add_integral" property="addIntegral" />
+        <result column="type_id" property="typeId" />
+        <result column="post_id" property="postId" />
+        <result column="dept_id" property="deptId" />
+        <result column="good_count_integral" property="goodCountIntegral" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        integral_id, user_id, user_name, user_phone, count_integral, del_integral, add_integral, type_id, post_id, dept_id, good_count_integral
+    </sql>
+
+  <select id="selectdan" resultMap="BaseResultMap">
+      select integral_id,user_id,user_name,user_phone,count_integral,del_integral,
+      add_integral,type_id,post_id,dept_id,good_count_integral from  integral WHERE user_id = #{userId}
+
+
+  </select>
+    
+    <update id="updatexiugai" parameterType="com.msj.goods.entity.Integral">
+     update  integral set count_integral = #{countIntegral},add_integral = #{addIntegral},
+     good_count_integral = #{goodCountIntegral}
+      where integral_id = #{integralId}
+
+
+    </update>
+
+</mapper>

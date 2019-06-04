@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msj.goods.mapper.LevelAssMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.msj.goods.entity.LevelAss">
+        <id column="level_id" property="levelId" />
+        <result column="ass_name" property="assName" />
+        <result column="dept_ids" property="deptIds" />
+        <result column="type_id" property="typeId" />
+        <result column="state" property="state" />
+        <result column="remark" property="remark" />
+        <result column="shen_qing_fang_shi" property="shenQingFangShi" />
+        <result column="user_id" property="userIds" />
+        <result column="carate_time" property="carateTime" />
+        <result column="number_id" property="numberid" />
+       <!-- <association property="sysDept" column="dept_id" javaType="com.msj.goods.entity.SysDept" resultMap="sysdeptResult" />
+        <association property="sysuser" column="user_id" javaType="com.msj.goods.entity.SysUser" resultMap="ku" />-->
+        <association property="sysDept" javaType="com.msj.goods.entity.SysDept">
+            <id property="deptId"    column="dept_id"    />
+            <result property="parentId"    column="parent_id"    />
+            <result property="deptName"    column="dept_name"    />
+        </association>
+        <association property="sysyuser" javaType="com.msj.goods.entity.SysUser">
+            <id property="userId"    column="user_id"    />
+            <result property="userName"    column="user_name"    />
+        </association>
+    </resultMap>
+
+   <!-- <resultMap id="sysdeptResult" type="com.msj.goods.entity.SysDept">
+
+    </resultMap>-->
+
+  <!--  <resultMap id="ku" type="com.msj.goods.entity.SysUser">
+        <id property="userId"    column="user_id"    />
+        <result property="userName"    column="user_name"    />
+    </resultMap>-->
+
+    <!-- 通用查询结果列 -->
+<!--    <sql id="selectLevelAssVo">
+      u.level_id, u.ass_name, u.dept_ids, u.type_id, u.state, u.remark,
+        d.dept_id,d.dept_name,d.parent_id,u.shen_qing_fang_shi,u.carate_time,u.user_id,dd.user_name
+         from level_ass u left join sys_dept d on u.dept_ids=d.dept_id
+         left join sys_user dd on dd.user_id=u.user_id
+    </sql>-->
+
+    <select id="selectLevelassList"  resultMap="BaseResultMap">
+          select u.level_id, u.ass_name, u.dept_ids, u.type_id, u.state, u.remark,
+        d.dept_id,d.dept_name,d.parent_id,u.shen_qing_fang_shi,u.carate_time,u.user_id,dd.user_name,u.number_id
+         from level_ass u left join sys_dept d on u.dept_ids=d.dept_id
+         left join sys_user dd on dd.user_id=u.user_id  where u.dept_ids = #{deptIds}
+         and  u.state=0
+        order  by carate_time desc
+    </select>
+
+    <select id="selectLevelAssid"  resultMap="BaseResultMap">
+          select level_id, ass_name, dept_ids, type_id, state, remark,user_id,number_id
+          from  level_ass where  level_id = #{levelId}
+
+
+
+    </select>
+
+
+    <update id="insertLevelAss" parameterType="LevelAss">
+        update level_ass
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="numberid != null  ">number_id = #{numberid},</if>
+        </trim>
+        where level_id = #{levelId}
+    </update>
+
+
+</mapper>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msj.goods.mapper.AssessmentStateMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.msj.goods.entity.AssessmentState">
+        <id column="zhu_id" property="zhuId" />
+        <result column="user_id" property="userId" />
+        <result column="level_id" property="levelId" />
+        <result column="state" property="state" />
+        <result column="shen_qing_fang_shi" property="shenQingFangShi" />
+        <result column="carate_time" property="carateTime" />
+        <result column="cheack" property="cheack" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+       SELECT zhu_id, user_id, level_id, state, shen_qing_fang_shi, carate_time,(CASE state when 1 then 'true' when 0 then 'false' end) AS cheack FROM assessment_state
+    </sql>
+
+    <insert id="insertassessmentState" parameterType="com.msj.goods.entity.AssessmentState" >
+        insert into  assessment_state
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null  ">user_id,</if>
+            <if test="levelId != null   ">level_id,</if>
+            <if test="state != null  ">state,</if>
+            <if test="shenQingFangShi != null  ">shen_qing_fang_shi,</if>
+            <if test="carateTime != null  ">carate_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null  ">#{userId},</if>
+            <if test="levelId != null  ">#{levelId},</if>
+            <if test="state != null  ">#{state},</if>
+            <if test="shenQingFangShi != null  ">#{shenQingFangShi},</if>
+            <if test="carateTime != null  ">#{carateTime},</if>
+        </trim>
+    </insert>
+
+    <select id="selectAssessmentState" parameterType="com.msj.goods.entity.AssessmentState"  resultMap="BaseResultMap">
+        <include refid="Base_Column_List"/>
+        <where>
+            <if test="userId != null  and userId != '' "> and user_id = #{userId}</if>
+        </where>
+
+
+
+    </select>
+
+    <delete id="updatezt" parameterType="Integer">
+        delete from assessment_state where shen_qing_fang_shi =3 and  state=1
+    </delete>
+
+</mapper>

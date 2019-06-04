@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msj.goods.mapper.GiveLikeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.msj.goods.entity.GiveLike">
+        <id column="d_id" property="dId" />
+        <result column="user_id" property="userId" />
+        <result column="benefit_id" property="benefitId" />
+        <result column="careate_time" property="careateTime" />
+        <result column="love_Integral" property="loveIntegral" />
+        <result column="count_Intefral" property="countIntefral" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        d_id, user_id, benefit_id, careate_time,love_Integral,count_Intefral
+    </sql>
+
+</mapper>

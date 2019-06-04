@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msj.goods.mapper.SysUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.msj.goods.entity.SysUser">
+        <id column="user_id" property="userId"/>
+        <result column="dept_id" property="deptId"/>
+        <result column="login_name" property="loginName"/>
+        <result column="user_name" property="userName"/>
+        <result column="user_type" property="userType"/>
+        <result column="email" property="email"/>
+        <result column="phonenumber" property="phonenumber"/>
+        <result column="sex" property="sex"/>
+        <result column="avatar" property="avatar"/>
+        <result column="password" property="password"/>
+        <result column="salt" property="salt"/>
+        <result column="status" property="status"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="login_ip" property="loginIp"/>
+        <result column="login_date" property="loginDate"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+        <result column="integral_complainant" property="integralComplainant"/>
+        <result column="ji_chu_integral" property="jiChuIntegral"/>
+        <result column="biao_integral" property="biaoIntegral"/>
+        <result column="love_integral" property="loveIntegral"/>
+        <result column="integral_status" property="integralStatus"/>
+        <result property="isApprover" column="is_approver"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="applyIds" column="apply_ids"/>
+        <result property="manAward" column="man_award"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        user_id, dept_id, login_name, user_name, user_type, email, phonenumber, sex, avatar, password, salt, status, del_flag, login_ip, login_date, create_by, create_time, update_by, update_time, remark, integral_complainant, ji_chu_integral, biao_integral, love_integral, integral_status, is_approver,dept_name,apply_ids,man_award
+    </sql>
+
+    <!--通过手机号查询当前登录对象-->
+    <select id="selectPhoneByUser" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_user WHERE del_flag ='0' AND phonenumber = #{phone}
+    </select>
+
+
+    <!-- 添加那个管理奖扣分数-->
+
+    <insert id="insertUser" parameterType="SysUser">
+        insert into sys_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null  ">user_id,</if>
+            <if test="quan != null  ">man_award, </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null  ">#{userId},</if>
+            <if test="quan != null  ">#{quan},</if>
+        </trim>
+    </insert>
+
+
+
+    <!--通过主键id查询当前登录对象-->
+    <select id="selectuserid" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_user WHERE del_flag ='0' AND user_id = #{userId}
+    </select>
+    <!--查询所有用户-->
+    <!--<select id="selectAllList" resultType="map" >
+        SELECT user_id as userId, dept_id as deptId,  user_name as userName from sys_user where del_flag='0' AND status = '0'
+    </select>-->
+    <update id="updateUser" parameterType="Integer">
+        update sys_user
+        <set>
+            <if test="love_integral !=null ">love_integral=#{love_integral}</if>
+        </set>
+        where status = 0
+    </update>
+    <!--获取点赞用的户信息-->
+    <select id="findByBenefitId" parameterType="java.util.Map" resultMap="BaseResultMap">
+        SELECT
+            a.user_id,
+            a.dept_id,
+            a.login_name,
+            a.user_name,
+            a.user_type,
+            a.email,
+            a.phonenumber,
+            a.sex,
+            a.avatar,
+            a. PASSWORD,
+            a.salt,
+            a. STATUS,
+            a.del_flag,
+            a.login_ip,
+            a.login_date,
+            a.create_by,
+            a.create_time,
+            a.update_by,
+            a.update_time,
+            a.remark,
+            a.integral_complainant,
+            a.ji_chu_integral,
+            a.biao_integral,
+            a.love_integral,
+            a.integral_status,
+            a.is_approver,
+            a.dept_name,
+            a.apply_ids
+        FROM
+            sys_user a,
+            give_like b
+        WHERE
+            a.user_id = b.user_id
+        AND b.benefit_id =#{benefit_id}
+        and b.careate_time between #{mondayDate}  and  #{sundayDate}
+    </select>
+    <!--查询所用属于本部门的员工-->
+    <select id="selectDeptAllUser" resultType="map">
+        select
+        sys_user.user_id as userId,
+        sys_user.user_name as userName,
+        sys_user.avatar as avatar,
+        sys_dept.dept_name as deptName
+        from sys_user,sys_dept where
+        sys_user.dept_id = sys_dept.dept_id
+        and sys_user.status =0
+        and sys_user.del_flag =0
+        and sys_user.integral_status =1
+        <if test="deptId !=null and deptId!=''">
+            and sys_user.dept_id =#{deptId}
+        </if>
+        <if test="userId !=null and userId!=''">
+            and sys_user.user_id != #{userId}
+        </if>
+        <if test="search !=null and search !=''">
+            and sys_user.user_name like concat(concat('%',#{search}),'%')
+        </if>
+    </select>
+
+    <select id="findUserByDepId" resultType="com.msj.goods.entity.SysUser">
+
+        SELECT
+        a.user_id userId,
+        a.user_name userName,
+        a.ji_chu_integral jiChuIntegral,
+        a.love_integral,
+        c.role_id integralStatus
+        FROM
+        sys_user a
+        INNER JOIN sys_user_role b ON a.user_id = b.user_id
+        INNER JOIN sys_role c ON b.role_id = c.role_id
+        WHERE
+        a.dept_id= #{deptId}
+        and a.del_flag = 0
+        <if test="userId !=null">
+            AND a.user_id != #{userId}
+        </if>
+        <if test="roleId !=null">
+            AND c.role_id = #{roleId}
+        </if>
+    </select>
+    <!--普通用户查询所有的部门人员-->
+    <select id="selectCommonDept" resultType="map">
+        select
+        sys_user.user_id as userId,
+        sys_user.user_name as userName,
+        sys_user.avatar as avatar,
+        sys_dept.dept_name as deptName,
+        sys_role.role_key as roleKey
+        from sys_user,sys_dept ,sys_role,sys_user_role where
+        sys_user.dept_id = sys_dept.dept_id and sys_user.user_id = sys_user_role.user_id
+        and sys_user_role.role_id = sys_role.role_id
+        and sys_user.status =0
+        and sys_user.del_flag =0
+        and sys_user.integral_status =1
+        <if test="deptId !=null and deptId!=''">
+            and sys_user.dept_id =#{deptId}
+        </if>
+        <if test="search !=null and search !=''">
+            and sys_user.user_name like concat(concat('%',#{search}),'%')
+        </if>
+    </select>
+
+    <!--普通用户查询所有的部门人员-->
+    <select id="selectCommonDept1" resultType="com.msj.goods.entity.ManageUser">
+        select
+        sys_user.user_id as userId,
+        sys_user.user_name as userName,
+        sys_user.avatar as avatar,
+        sys_dept.dept_name as deptName,
+        sys_role.role_key as roleKey
+        from sys_user,sys_dept ,sys_role,sys_user_role where
+        sys_user.dept_id = sys_dept.dept_id and sys_user.user_id = sys_user_role.user_id
+        and sys_user_role.role_id = sys_role.role_id
+        and sys_user.status =0
+        and sys_user.del_flag =0
+        and sys_user.integral_status =1
+        <if test="deptId !=null and deptId!=''">
+            and sys_user.dept_id =#{deptId}
+        </if>
+        <if test="search !=null and search !=''">
+            and sys_user.user_name like concat(concat('%',#{search}),'%')
+        </if>
+    </select>
+
+    <!-- 经理级别的奖励人员查询 -->
+    <select id="selectManagerDept" resultType="com.msj.goods.entity.ManageUser">
+        select
+        sys_user.user_id as userId,
+        sys_user.user_name as userName,
+        sys_user.avatar as avatar,
+        sys_dept.dept_name as deptName
+        from sys_user,sys_dept where
+        sys_user.dept_id = sys_dept.dept_id
+        and sys_user.status =0
+        and sys_user.del_flag =0
+        and sys_user.integral_status =1
+        and sys_user.user_id != #{userId}
+        <if test="deptId !=null and deptId!=''">
+            and sys_user.dept_id =#{deptId}
+        </if>
+        <if test="search !=null and search !=''">
+            and sys_user.user_name like concat(concat('%',#{search}),'%')
+        </if>
+    </select>
+    <!--         select
+        sys_user.user_id as userId,
+        sys_user.user_name as userName,
+        sys_user.avatar as avatar,
+        sys_dept.dept_name as deptName
+        from sys_user,sys_dept where
+        sys_user.dept_id = sys_dept.dept_id
+        and sys_user.status =0
+        and sys_user.del_flag =0
+        and sys_user.integral_status =1
+        and sys_user.user_id != #{userId}-->
+
+    <!-- 总监级 查询所管理部门 经理级别的人员 -->
+    <select id="selectDirectorDept" resultType="com.msj.goods.entity.ManageUser">
+
+        select
+        sys_user.user_id as userId,
+        sys_user.user_name as userName,
+        sys_user.avatar as avatar,
+        sys_dept.dept_name as deptName
+        from sys_user,sys_dept,sys_user_dept_post,sys_user_role where
+        sys_user.dept_id = sys_dept.dept_id and sys_dept.dept_id = sys_user_dept_post.dept_id
+        and sys_user.user_id = sys_user_role.user_id
+
+        and sys_user.status =0
+        and sys_user.del_flag =0
+        and sys_user.integral_status =1
+        and sys_user.user_id != #{userId}
+        and sys_user_dept_post.user_id = #{userId}
+        and sys_user_dept_post.dept_id != 146
+        <if test="status !=null and status!=''">
+            and sys_user.is_approver =#{status}
+        </if>
+        <if test="deptId !=null and deptId!=''">
+            and sys_user.dept_id =#{deptId}
+        </if>
+        <if test="search !=null and search !=''">
+            and sys_user.user_name like concat(concat('%',#{search}),'%')
+        </if>
+    </select>
+    <!-- 事业部总经理 查询所管理部门 经理级别的人员 -->
+    <select id="selectGeneralManagerDept" resultType="com.msj.goods.entity.ManageUser">
+        select
+        sys_user.user_id as userId,
+        sys_user.user_name as userName,
+        sys_user.avatar as avatar,
+        sys_dept.dept_name as deptName,
+        sys_role.role_key as roleKey
+        from sys_user,sys_dept ,sys_role,sys_user_role where
+        sys_user.dept_id = sys_dept.dept_id and sys_user.user_id = sys_user_role.user_id
+        and sys_user_role.role_id = sys_role.role_id
+        and sys_user.status =0
+        and sys_user.del_flag =0
+        and sys_user.integral_status =1
+        <if test="deptId !=null and deptId !=''">
+            and sys_user.dept_id =#{deptId}
+        </if>
+        <if test="search !=null and search !=''">
+            and sys_user.user_name like concat(concat('%',#{search}),'%')
+        </if>
+    </select>
+    <!-- 医美 市场部查询经理角色 -->
+    <select id="selectRole" resultType="com.msj.goods.entity.ManageUser" >
+         select
+        sys_user.user_id as userId,
+        sys_user.user_name as userName,
+        sys_user.avatar as avatar,
+        sys_dept.dept_name as deptName
+        from sys_user,sys_dept,sys_user_dept_post,sys_user_role where
+        sys_user.dept_id = sys_dept.dept_id and sys_dept.dept_id = sys_user_dept_post.dept_id
+        and sys_user.user_id = sys_user_role.user_id
+
+        and sys_user.status =0
+        and sys_user.del_flag =0
+        and sys_user.integral_status =1
+        <if test="deptId !=null and deptId !=''">
+            and   sys_user_dept_post.dept_id = #{deptId}
+        </if>
+        <if test="status !=null">
+            AND sys_user_role.role_id = #{status}
+        </if>
+
+    </select>
+</mapper>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msj.goods.mapper.IntegralGoodsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.msj.goods.entity.IntegralGoods">
+        <id column="good_id" property="goodId" />
+        <result column="good_name" property="goodName" />
+        <result column="good_count" property="goodCount" />
+        <result column="good_kc" property="goodKc" />
+        <result column="ydh_num" property="ydhNum" />
+        <result column="dh_integral" property="dhIntegral" />
+        <result column="status" property="status" />
+        <result column="good_lb_img" property="goodLbImg" />
+        <result column="good_details" property="goodDetails" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="remark" property="remark" />
+        <result column="good_img" property="goodImg" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        good_id, good_name, good_count, good_kc, ydh_num, dh_integral, status, good_lb_img, good_details, create_time, update_time, remark,good_img
+    </sql>
+
+</mapper>

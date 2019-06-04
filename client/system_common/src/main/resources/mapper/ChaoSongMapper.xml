@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msj.goods.mapper.ChaoSongMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.msj.goods.entity.ChaoSong">
+        <id column="c_id" property="cId" />
+        <result column="user_id" property="userId" />
+        <result column="chao_song_id" property="chaoSongId" />
+        <result column="approval_id" property="approvalId" />
+        <result column="chao_time" property="chaoTime" />
+        <result column="remak" property="remak" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        c_id, user_id, chao_song_id, approval_id, chao_time, remak
+    </sql>
+    <!--查询有多少人给自己抄送未审批的数量 -->
+    <select id="selectNotAppCount" resultType="int" >
+        select count(1) from chao_song as cs, integral_approval as ia
+        where cs.approval_id = ia.approval_id
+        AND ia.status = 0   AND cs.chao_song_id =#{userId}
+    </select>
+</mapper>

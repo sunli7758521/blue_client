@@ -1,0 +1,912 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msj.goods.mapper.IntegralApprovalMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.msj.goods.entity.IntegralApproval">
+        <id column="approval_id" property="approvalId" />
+        <result column="approval_num" property="approvalNum" />
+        <result column="approval_title" property="approvalTitle" />
+        <result column="approval_content" property="approvalContent" />
+        <result column="user_id" property="userId" />
+        <result column="user_name" property="userName" />
+        <result column="user_img" property="userImg" />
+        <result column="user_phone" property="userPhone" />
+        <result column="user_dept" property="userDept" />
+        <result column="user_dept_id" property="userDeptId" />
+        <result column="user_post_id" property="userPostId" />
+        <result column="user_post" property="userPost" />
+        <result column="ti_jiao_id" property="tiJiaoId" />
+        <result column="ti_jiao_name" property="tiJiaoName" />
+        <result column="ti_jiao_name_img" property="tiJiaoNameImg" />
+        <result column="integral_type_id" property="integralTypeId" />
+        <result column="sq_time" property="sqTime" />
+        <result column="sp_time" property="spTime" />
+        <result column="status" property="status" />
+        <result column="sq_integral" property="sqIntegral" />
+        <result column="sp_remark" property="spRemark" />
+        <result column="approval_time" property="approvalTime" />
+        <result column="approval_img1" property="approvalImg1" />
+        <result column="approval_img2" property="approvalImg2" />
+        <result column="approval_img3" property="approvalImg3" />
+        <result column="approval_img4" property="approvalImg4" />
+        <result column="approval_img5" property="approvalImg5" />
+        <result column="approval_img6" property="approvalImg6" />
+        <result column="approval_img7" property="approvalImg7" />
+        <result column="approval_img8" property="approvalImg8" />
+        <result column="approval_img9" property="approvalImg9" />
+        <result column="remark" property="remark" />
+        <result column="k_integral" property="kIntegral" />
+        <result column="chao_song_id" property="chaoSongId" />
+        <result column="chao_song_name" property="chaoSongName" />
+        <result column="chao_song_img" property="chaoSongImg" />
+        <result column="chao_song_dept_name" property="chaoSongDeptName" />
+        <result column="chao_song_dept_id" property="chaoSongDeptId" />
+        <result column="type_id" property="typeId" />
+        <result column="count_integral" property="countIntegral" />
+        <result column="add_integral" property="addIntegral" />
+        <result column="deduce" property="deduce" />
+        <result column="amount" property="amount" />
+        <result column="ti_jiao_ren_ids" property="tiJiaoRenIds" />
+        <result column="chao_song_ids" property="chaoSongIds" />
+        <result column="shen_pi_ren_ids" property="shenPiRenIds" />
+        <result column="menu_id" property="menuId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        approval_id, approval_num, approval_title, approval_content, user_id, user_name, user_img, user_phone, user_dept, user_dept_id, user_post_id, user_post, ti_jiao_id, ti_jiao_name, ti_jiao_name_img, integral_type_id, sq_time, sp_time, status, sq_integral, sp_remark, approval_time, approval_img1, approval_img2, approval_img3, approval_img4, approval_img5, approval_img6, approval_img7, approval_img8, approval_img9, remark, k_integral, chao_song_id, chao_song_name, chao_song_img, chao_song_dept_name, chao_song_dept_id, type_id, count_integral, add_integral, deduce, amount, ti_jiao_ren_ids, chao_song_ids, shen_pi_ren_ids,menu_id
+    </sql>
+    <sql id="aa">
+        integral_approval.approval_id as approvalId,
+        integral_approval.approval_title AS approvalTitle,
+        integral_approval.approval_content AS approvalContent,
+        integral_approval.user_name AS userName,
+        integral_approval.user_img AS userImg,
+        integral_approval.integral_type_id AS integralTypeId,
+        integral_approval.sq_time AS sqTime,
+        integral_approval.sp_time as spTime,
+        integral_approval.sq_integral as sqIntegral,
+        integral_approval.status as status,
+        integral_approval.approval_img1 AS approvalImg1,
+        integral_approval.k_integral AS kIntegral
+    </sql>
+    <!--查询冠军-->
+    <select id="selectGJ" resultType="Map">
+        SELECT @rownum:=@rownum+1 AS rownum,IF(@total = amount ,@rank ,@rank :=@rownum) AS rank ,
+        @total := amount as total, integral_approval.*  FROM
+        (
+        select sum(integral_approval.sq_integral) - sum(integral_approval.k_integral) + sys_user.ji_chu_integral as amount ,integral_approval.user_name as userName,integral_approval.user_img as userImg,sys_user.user_id as userId,
+                integral_approval.sq_integral as sqIntegral,
+                sum(integral_approval.k_integral) as deduce
+                from integral_approval,sys_user
+                where integral_approval.user_id = sys_user.user_id
+        AND sys_user.integral_status = 1   AND  sys_user.status = 0
+       /* AND sys_user.is_approver in(1,2,3) */
+        AND integral_approval.user_dept_id = #{deptIds}
+        AND  integral_approval.status=1
+        AND   TO_DAYS(integral_approval.sp_time) = TO_DAYS(NOW())
+        GROUP BY integral_approval.user_name
+        ORDER BY sum(integral_approval.sq_integral) DESC
+        ) as integral_approval,
+        (    SELECT    @rank := 0 ,@rownum := 0 ,@total := NULL    ) as t;
+
+    </select>
+    <!--  超级管理员查询当日积分榜的数据  -->
+    <select id="selectAllDayData" resultType="map" >
+
+        SELECT @rownum:=@rownum+1 AS rownum,IF(@total = amount ,@rank ,@rank :=@rownum) AS rank ,
+        @total := amount as total, amount,userName, userImg, userId,sqIntegral,deduce  FROM
+        (
+        select
+        sum(integral_approval.sq_integral) - sum(integral_approval.k_integral) + sys_user.ji_chu_integral as amount,
+        sys_user.user_name as userName,
+        sys_user.avatar as userImg,
+        sys_user.user_id as userId,
+        (sum(integral_approval.sq_integral) -  sum(integral_approval.k_integral)) as sqIntegral,
+        sum(integral_approval.k_integral) as deduce
+        from integral_approval,sys_user  where integral_approval.user_id = sys_user.user_id
+        AND sys_user.integral_status = 1     AND
+        integral_approval.status = 1  AND  sys_user.del_flag = 0
+               <if test="search != null and search !=''" >
+                    AND  sys_user.user_name like  concat(concat('%',#{search}),'%')
+                 </if>
+                 <if test="typeId != null and typeId !=''" >
+                     AND  integral_approval.type_id = #{typeId}
+                 </if>
+                 <if test="deptIds != null " >
+                    AND sys_user.dept_id = #{deptIds}
+                 </if>
+                 <if test="postId != null and postId !=''" >
+                     AND  integral_approval.user_post_id = #{postId}
+                 </if>
+        AND   TO_DAYS(integral_approval.sp_time) = TO_DAYS(NOW())
+        GROUP BY sys_user.user_id  ORDER BY sum(integral_approval.sq_integral) DESC
+        ) as integral_approval,
+        (    SELECT    @rank := 0 ,@rownum := 0 ,@total := NULL    ) as t
+    </select>
+    <!--超级管理员查询当月积分榜的数据 -->
+    <select id="selectAllMonthData"  resultType="map" >
+
+        SELECT @rownum:=@rownum+1 AS rownum,IF(@total = amount ,@rank ,@rank :=@rownum) AS rank ,
+        @total := amount as total, amount,userName, userImg, userId,sqIntegral,deduce  FROM
+        (
+        select
+        sum(integral_approval.sq_integral) - sum(integral_approval.k_integral) + sys_user.ji_chu_integral as amount,
+        sys_user.user_name as userName,
+        sys_user.avatar as userImg,
+        sys_user.user_id as userId,
+        (sum(integral_approval.sq_integral) -  sum(integral_approval.k_integral)) as sqIntegral,
+        sum(integral_approval.k_integral) as deduce
+        from integral_approval,sys_user  where integral_approval.user_id = sys_user.user_id
+        AND sys_user.integral_status = 1     AND
+        integral_approval.status = 1  AND  sys_user.del_flag = 0
+        <if test="search != null and search !=''" >
+            AND  sys_user.user_name like  concat(concat('%',#{search}),'%')
+        </if>
+        <if test="typeId != null and typeId !=''" >
+            AND  integral_approval.type_id = #{typeId}
+        </if>
+        <if test="deptIds != null " >
+            AND sys_user.dept_id = #{deptIds}
+        </if>
+        <if test="postId != null and postId !=''" >
+            AND  integral_approval.user_post_id = #{postId}
+        </if>
+        and    date_format(integral_approval.sp_time,'%Y-%m')= date_format(now(),'%Y-%m')
+        GROUP BY sys_user.user_id  ORDER BY sum(integral_approval.sq_integral) DESC
+        ) as integral_approval,
+        (    SELECT    @rank := 0 ,@rownum := 0 ,@total := NULL    ) as t
+
+    </select>
+    <!--  超级管理员查询当季数据 -->
+    <select id="selectAllJiData"  resultType="map" >
+        SELECT @rownum:=@rownum+1 AS rownum,IF(@total = amount ,@rank ,@rank :=@rownum) AS rank ,
+        @total := amount as total, amount,userName, userImg, userId,sqIntegral,deduce  FROM
+        (
+        select
+        sum(integral_approval.sq_integral) - sum(integral_approval.k_integral) + sys_user.ji_chu_integral as amount,
+        sys_user.user_name as userName,
+        sys_user.avatar as userImg,
+        sys_user.user_id as userId,
+        (sum(integral_approval.sq_integral) -  sum(integral_approval.k_integral)) as sqIntegral,
+        sum(integral_approval.k_integral) as deduce
+        from integral_approval,sys_user  where integral_approval.user_id = sys_user.user_id
+        AND sys_user.integral_status = 1     AND
+        integral_approval.status = 1  AND  sys_user.del_flag = 0
+        <if test="search != null and search !=''" >
+            AND  sys_user.user_name like  concat(concat('%',#{search}),'%')
+        </if>
+        <if test="typeId != null and typeId !=''" >
+            AND  integral_approval.type_id = #{typeId}
+        </if>
+        <if test="deptIds != null " >
+            AND sys_user.dept_id = #{deptIds}
+        </if>
+        <if test="postId != null and postId !=''" >
+            AND  integral_approval.user_post_id = #{postId}
+        </if>
+        AND   QUARTER(integral_approval.sp_time)=QUARTER(now())
+        GROUP BY sys_user.user_id  ORDER BY sum(integral_approval.sq_integral) DESC
+        ) as integral_approval,
+        (    SELECT    @rank := 0 ,@rownum := 0 ,@total := NULL    ) as t
+
+
+    </select>
+    <!-- 超级管理员查询本年的数据 -->
+    <select id="selectAllYearData" resultType="map" >
+        SELECT @rownum:=@rownum+1 AS rownum,IF(@total = amount ,@rank ,@rank :=@rownum) AS rank ,
+        @total := amount as total, integral_approval.*  FROM
+        (
+        select
+        sum(integral_approval.sq_integral) - sum(integral_approval.k_integral) + sys_user.ji_chu_integral as amount,
+        integral_approval.user_name as userName,
+        integral_approval.user_img as userImg,
+        sys_user.user_id as userId,
+        (sum(integral_approval.sq_integral) -  sum(integral_approval.k_integral)) as sqIntegral,
+        sum(integral_approval.k_integral) as deduce
+        from integral_approval,sys_user  where integral_approval.user_id = sys_user.user_id
+        AND sys_user.integral_status = 1   AND sys_user.is_approver IN (1,2,3,4,5,6,7,8,9)    AND
+        integral_approval.status = 1  AND  sys_user.del_flag = 0   AND  sys_user.status = 0
+
+        <if test="search != null and search !=''" >
+            AND  integral_approval.user_name like  concat(concat('%',#{search}),'%')
+        </if>
+        <if test="typeId != null and typeId !=''" >
+            AND  integral_approval.type_id = #{typeId}
+        </if>
+        <if test="deptIds != null " >
+            AND integral_approval.user_dept_id = #{deptIds}
+        </if>
+        <if test="postId != null and postId !=''" >
+            AND  integral_approval.user_post_id = #{postId}
+        </if>
+        AND   date_format(integral_approval.sp_time,'%Y') = year(now())
+        GROUP BY integral_approval.user_name  ORDER BY sum(integral_approval.sq_integral) DESC
+        ) as integral_approval,
+        (    SELECT    @rank := 0 ,@rownum := 0 ,@total := NULL    ) as t
+    </select>
+    <!-- 审批人查询所用待自己审批 -->
+    <select id="selectAllList"  resultType="com.msj.goods.entity.App" >
+        select
+        <include refid="aa" />
+        from
+        integral_approval
+       <where>
+           <if test="status !=null" >
+                 integral_approval.status = #{status}
+           </if>
+           <if test="search !=null and search !=''">
+               and integral_approval.user_name  LIKE  concat(concat('%',#{search}),'%')
+           </if>
+           <if test="userId !=null " >
+               and integral_approval.shen_pi_ren_ids =  #{userId}
+           </if>
+           ORDER BY integral_approval.sq_time DESC
+       </where>
+
+
+    </select>
+
+
+    <!--抄送我的未审核列表-->
+    <select id="selectCswdNot" resultMap="BaseResultMap" >
+        select ia.* from integral_approval as ia ,chao_song as cs
+        where ia.approval_id = cs.approval_id AND ia.status=0
+        AND cs.chao_song_id = #{userId}
+        <if test="search != null  and search !=''" >
+            AND ia.user_name LIKE concat(concat('%',#{search}),'%')
+        </if>
+        ORDER BY ia.sq_time DESC
+    </select>
+    <!--抄送我的审批通过和撤销审批-->
+    <select id="selectCswdYesAndCheXiao" resultMap="BaseResultMap" >
+        select ia.* from integral_approval as ia ,chao_song as cs
+        where ia.approval_id = cs.approval_id AND ia.status in (1,2)
+        AND cs.chao_song_id = #{userId}
+        <if test="search != null  and search !=''" >
+            AND ia.user_name LIKE concat(concat('%',#{search}),'%')
+        </if>
+        ORDER BY ia.sq_time DESC
+    </select>
+
+    <!-- 查询待我审批-->
+    <select id="selectCountDwsp" resultType="int" >
+        select count(1) from integral_approval
+        where
+         integral_approval.status=0
+
+        <if test="userId !=null and userId != ''" >
+            AND integral_approval.shen_pi_ren_ids = #{userId}
+        </if>
+        ORDER BY integral_approval.sq_time DESC
+    </select>
+    <!-- 审批人之间的排名  首页显示冠军  -->
+    <select id="selectCommonGJ"  resultType="map">
+        SELECT @rownum:=@rownum+1 AS rownum,IF(@total = amount ,@rank ,@rank :=@rownum) AS rank ,
+        @total := amount as total, amount, userName,userImg,userId   FROM
+        (
+        select sum(integral_approval.sq_integral)  as amount,
+        sys_user.user_name as userName,
+        sys_user.avatar as userImg,
+        sys_user.user_id as userId
+        from integral_approval,sys_user
+        where integral_approval.user_id = sys_user.user_id
+        AND sys_user.integral_status = 1
+        AND  sys_user.status = 0
+        AND integral_approval.status=1
+         <if test="deptId !=null ">
+        AND integral_approval.user_dept_id = #{deptId}
+         </if>
+        AND  TO_DAYS(integral_approval.sp_time) = TO_DAYS(NOW())
+        GROUP BY sys_user.user_id
+        ORDER BY sum(integral_approval.sq_integral) DESC
+        ) as integral_approval,
+        (    SELECT    @rank := 0 ,@rownum := 0 ,@total := NULL    ) as t
+    </select>
+<!--    &lt;!&ndash; 普通员工  首页显示冠军  &ndash;&gt;-->
+<!--    <select id="selectAllGJ" resultType="map" >-->
+<!--         SELECT @rownum:=@rownum+1 AS rownum,IF(@total = amount ,@rank ,@rank :=@rownum) AS rank ,-->
+<!--        @total := amount as total, amount FROM-->
+<!--        (-->
+<!--        select sum(integral_approval.sq_integral) as amount,integral_approval.user_name as userName,integral_approval.user_img as userImg,sys_user.user_id as userId,-->
+<!--                integral_approval.sq_integral as sqIntegral,-->
+<!--        sum(integral_approval.k_integral) as deduce-->
+<!--                from integral_approval,sys_user-->
+<!--                where integral_approval.user_id = sys_user.user_id-->
+<!--        AND sys_user.integral_status = 1-->
+<!--        AND integral_approval.status=1-->
+<!--        AND  sys_user.status = 0-->
+<!--        <if test="isApprover !=null ">-->
+<!--            AND sys_user.is_approver =#{isApprover}-->
+<!--        </if>-->
+<!--		AND  TO_DAYS(integral_approval.sp_time) = TO_DAYS(NOW())-->
+<!--        GROUP BY integral_approval.user_name-->
+<!--        ORDER BY sum(integral_approval.sq_integral) DESC-->
+<!--        ) as integral_approval,-->
+<!--        (    SELECT    @rank := 0 ,@rownum := 0 ,@total := NULL    ) as t-->
+<!--    </select>-->
+
+  <!-- 审批不通 和撤销-->
+    <select id="selectAllListNo" resultType="com.msj.goods.entity.App" >
+        select
+        <include refid="aa" />
+        from
+        integral_approval
+        <where>
+            <if test="status !=null" >
+                  integral_approval.status in (1,2)
+            </if>
+            <if test="search !=null and search !=''">
+                and integral_approval.user_name  LIKE  concat(concat('%',#{search}),'%')
+            </if>
+            <if test="userId !=null and userId !=''" >
+                and integral_approval.shen_pi_ren_ids = #{userId}
+            </if>
+            ORDER BY integral_approval.sq_time DESC
+        </where>
+
+
+    </select>
+    <!-- 普通用户 查询本部门所有的日志但不包括 经理，职能总监，总监级，总经理级 和总裁级 -->
+    <select id="selectCommon"  resultType="com.msj.goods.entity.AppLog">
+        select
+        <include refid="aa"  />
+        FROM
+        integral_approval as integral_approval,
+        sys_user as u
+        where
+        integral_approval.user_id = u.user_id
+        and
+        integral_approval.status =1
+        and
+        integral_approval.user_dept_id =#{deptId}
+        AND  u.status = 0
+        and
+        u.is_approver
+        not IN (2,4,5,6,9)
+        ORDER BY integral_approval.sp_time DESC
+    </select>
+
+<!--     超级管理员查询所有的日志 -->
+    <select id="selectListAll" resultType="com.msj.goods.entity.AppLog" >
+       select
+        integral_approval.approval_id as approvalId,
+        integral_approval.approval_title AS approvalTitle,
+        integral_approval.approval_content AS approvalContent,
+        integral_approval.user_name AS userName,
+        integral_approval.user_img AS userImg,
+        integral_approval.integral_type_id AS integralTypeId,
+        integral_approval.sq_time AS sqTime,
+        integral_approval.sp_time as spTime,
+        integral_approval.sq_integral as sqIntegral,
+        integral_approval.status as status,
+        integral_approval.approval_img1 AS approvalImg1,
+        integral_approval.k_integral AS kIntegral
+        FROM
+        integral_approval   WHERE
+           integral_approval.status =1
+        ORDER BY integral_approval.sp_time DESC
+    </select>
+    <!-- 通用查询管理者所管理部门人员的所有信息  -->
+    <select id="managementAllDept" resultType="com.msj.goods.entity.AppLog" >
+        select
+        <include refid="aa"  />
+        ,
+        sys_role.role_key as roleKey
+        FROM
+        integral_approval LEFT JOIN sys_user on
+        integral_approval.user_id = sys_user.user_id
+        LEFT JOIN sys_user_role ON sys_user.user_id = sys_user_role.user_id
+        LEFT JOIN sys_role ON sys_user_role.role_id = sys_role.role_id
+        WHERE  integral_approval.status =1
+        AND  sys_user.status = 0
+        and sys_user.del_flag = 0
+        <if test="deptId !=null and deptId !=''" >
+            and   integral_approval.user_dept_id = #{deptId}
+        </if>
+        <if test="roleKey !=null and roleKey !=''" >
+            OR sys_role.role_key=#{roleKey}
+        </if>
+        ORDER BY integral_approval.sp_time DESC
+    </select>
+    <!-- 普通员工查询本部门当天的数据排名 -->
+    <select id="selectCommonDayData" resultType="map" >
+
+        SELECT @rownum:=@rownum+1 AS rownum,IF(@total = amount ,@rank ,@rank :=@rownum) AS rank ,
+        @total := amount as total, integral_approval.*  FROM
+        (
+        select
+        sum(integral_approval.sq_integral) - sum(integral_approval.k_integral) + sys_user.ji_chu_integral as amount,
+        integral_approval.user_name as userName,
+        integral_approval.user_img as userImg,
+        sys_user.user_id as userId,
+        (sum(integral_approval.sq_integral) -  sum(integral_approval.k_integral)) as sqIntegral,
+        sum(integral_approval.k_integral) as deduce
+        from integral_approval,sys_user  where integral_approval.user_id = sys_user.user_id
+        AND sys_user.integral_status = 1     AND
+        integral_approval.status = 1  AND  sys_user.del_flag = 0
+        AND  sys_user.status = 0
+        <if test="search != null and search !=''" >
+            AND  integral_approval.user_name like  concat(concat('%',#{search}),'%')
+        </if>
+        <if test="commonDeptId != null and commonDeptId !=''" >
+            AND integral_approval.user_dept_id = #{commonDeptId}
+        </if>
+        AND   TO_DAYS(integral_approval.sp_time) = TO_DAYS(NOW())
+        GROUP BY sys_user.user_id ORDER BY sum(integral_approval.sq_integral) DESC
+        ) as integral_approval,
+        (    SELECT    @rank := 0 ,@rownum := 0 ,@total := NULL    ) as t
+
+    </select>
+
+    <!-- 普通员工查询本部门当月的数据排名  -->
+    <select id="selectCommonMonthData" resultType="map" >
+        SELECT @rownum:=@rownum+1 AS rownum,IF(@total = amount ,@rank ,@rank :=@rownum) AS rank ,
+        @total := amount as total, integral_approval.*  FROM
+        (
+        select
+        sum(integral_approval.sq_integral) - sum(integral_approval.k_integral) + sys_user.ji_chu_integral as amount,
+        integral_approval.user_name as userName,
+        integral_approval.user_img as userImg,
+        sys_user.user_id as userId,
+        (sum(integral_approval.sq_integral) -  sum(integral_approval.k_integral)) as sqIntegral,
+        sum(integral_approval.k_integral) as deduce
+        from integral_approval,sys_user  where integral_approval.user_id = sys_user.user_id
+        AND sys_user.integral_status = 1     AND
+        integral_approval.status = 1  AND  sys_user.del_flag = 0
+        AND  sys_user.status = 0
+        <if test="search != null and search !=''" >
+            AND  integral_approval.user_name like  concat(concat('%',#{search}),'%')
+        </if>
+        <if test="commonDeptId != null and commonDeptId !=''" >
+            AND integral_approval.user_dept_id = #{commonDeptId}
+        </if>
+        and    date_format(integral_approval.sp_time,'%Y-%m')= date_format(now(),'%Y-%m')
+        GROUP BY sys_user.user_id  ORDER BY sum(integral_approval.sq_integral) DESC
+        ) as integral_approval,
+        (    SELECT    @rank := 0 ,@rownum := 0 ,@total := NULL    ) as t
+    </select>
+    <!--  普通员工查询本部门当季的数据排名  -->
+    <select id="selectCommonJiData" resultType="map" >
+        SELECT @rownum:=@rownum+1 AS rownum,IF(@total = amount ,@rank ,@rank :=@rownum) AS rank ,
+        @total := amount as total, integral_approval.*  FROM
+        (
+        select
+        sum(integral_approval.sq_integral) - sum(integral_approval.k_integral) + sys_user.ji_chu_integral as amount,
+        integral_approval.user_name as userName,
+        integral_approval.user_img as userImg,
+        sys_user.user_id as userId,
+        (sum(integral_approval.sq_integral) -  sum(integral_approval.k_integral)) as sqIntegral,
+        sum(integral_approval.k_integral) as deduce
+        from integral_approval,sys_user  where integral_approval.user_id = sys_user.user_id
+        AND sys_user.integral_status = 1    AND
+        integral_approval.status = 1  AND  sys_user.del_flag = 0
+        AND  sys_user.status = 0
+        <if test="search != null and search !=''" >
+            AND  integral_approval.user_name like  concat(concat('%',#{search}),'%')
+        </if>
+        <if test="commonDeptId != null and commonDeptId !=''" >
+            AND integral_approval.user_dept_id = #{commonDeptId}
+        </if>
+
+        AND   QUARTER(integral_approval.sp_time)=QUARTER(now())
+        GROUP BY sys_user.user_id  ORDER BY sum(integral_approval.sq_integral) DESC
+        ) as integral_approval,
+        (    SELECT    @rank := 0 ,@rownum := 0 ,@total := NULL    ) as t
+    </select>
+
+    <!-- 普通员工查询本部门当年的数据排名    -->
+    <select id="selectCommonYearData" resultType="map" >
+        SELECT @rownum:=@rownum+1 AS rownum,IF(@total = amount ,@rank ,@rank :=@rownum) AS rank ,
+        @total := amount as total, integral_approval.*  FROM
+        (
+        select
+        sum(integral_approval.sq_integral) - sum(integral_approval.k_integral) + sys_user.ji_chu_integral as amount,
+        integral_approval.user_name as userName,
+        integral_approval.user_img as userImg,
+        sys_user.user_id as userId,
+        (sum(integral_approval.sq_integral) -  sum(integral_approval.k_integral)) as sqIntegral,
+        sum(integral_approval.k_integral) as deduce
+        from integral_approval,sys_user  where integral_approval.user_id = sys_user.user_id
+        AND sys_user.integral_status = 1    AND
+        integral_approval.status = 1  AND  sys_user.del_flag = 0
+        AND  sys_user.status = 0
+        <if test="search != null and search !=''" >
+            AND  integral_approval.user_name like  concat(concat('%',#{search}),'%')
+        </if>
+        <if test="commonDeptId != null and commonDeptId !=''" >
+            AND integral_approval.user_dept_id = #{commonDeptId}
+        </if>
+        AND   date_format(integral_approval.sp_time,'%Y') = year(now())
+        GROUP BY sys_user.user_id  ORDER BY sum(integral_approval.sq_integral) DESC
+        ) as integral_approval,
+        (    SELECT    @rank := 0 ,@rownum := 0 ,@total := NULL    ) as t
+    </select>
+    <!-- 经理级审批 查询当日的数据 -->
+    <select id="selectManagerDayData" resultType="map" >
+        SELECT @rownum:=@rownum+1 AS rownum,IF(@total = amount ,@rank ,@rank :=@rownum) AS rank ,
+        @total := amount as total, integral_approval.*  FROM
+        (
+        select
+        sum(integral_approval.sq_integral) - sum(integral_approval.k_integral) + sys_user.ji_chu_integral as amount,
+        integral_approval.user_name as userName,
+        integral_approval.user_img as userImg,
+        sys_user.user_id as userId,
+        (sum(integral_approval.sq_integral) -  sum(integral_approval.k_integral)) as sqIntegral,
+        sum(integral_approval.k_integral) as deduce
+        from integral_approval,sys_user  where integral_approval.user_id = sys_user.user_id
+        AND sys_user.integral_status = 1
+        AND   integral_approval.status = 1  AND  sys_user.del_flag = 0
+        AND  sys_user.status = 0
+        <if test="search != null and search !=''" >
+            AND  integral_approval.user_name like  concat(concat('%',#{search}),'%')
+        </if>
+        <if test="typeId != null and typeId !=''" >
+            AND  integral_approval.type_id = #{typeId}
+        </if>
+        <if test="deptIds != null and deptIds !=''" >
+            AND integral_approval.user_dept_id = #{deptIds}
+        </if>
+        <if test="postId != null and postId !=''" >
+            AND  integral_approval.user_post_id = #{postId}
+        </if>
+        <if test="spTime1 != null and spTime1 !=''" >
+            AND date_format(integral_approval.sp_time,'%Y%m%d%H%i%s')  <![CDATA[ >= ]]>  #{spTime1}
+        </if>
+        <if test="spTime2 != null and spTime2 !=''" >
+            AND date_format(integral_approval.sp_time,'%Y%m%d%H%i%s')  <![CDATA[ <= ]]>  #{spTime2}
+        </if>
+        AND   TO_DAYS(integral_approval.sp_time) =  TO_DAYS(NOW())
+        GROUP BY sys_user.user_id  ORDER BY sum(integral_approval.sq_integral) DESC
+        ) as integral_approval,
+        (    SELECT    @rank := 0 ,@rownum := 0 ,@total := NULL    ) as t
+    </select>
+    <!-- 经理级审批 查询当月的数据 -->
+    <select id="selectManagerMonthData" resultType="map" >
+        SELECT @rownum:=@rownum+1 AS rownum,IF(@total = amount ,@rank ,@rank :=@rownum) AS rank ,
+        @total := amount as total, integral_approval.*  FROM
+        (
+        select
+        sum(integral_approval.sq_integral) - sum(integral_approval.k_integral) + sys_user.ji_chu_integral as amount,
+        integral_approval.user_name as userName,
+        integral_approval.user_img as userImg,
+        sys_user.user_id as userId,
+        (sum(integral_approval.sq_integral) -  sum(integral_approval.k_integral)) as sqIntegral,
+        sum(integral_approval.k_integral) as deduce
+        from integral_approval,sys_user  where integral_approval.user_id = sys_user.user_id
+        AND sys_user.integral_status = 1
+        AND   integral_approval.status = 1  AND  sys_user.del_flag = 0
+        AND  sys_user.status = 0
+        <if test="search != null and search !=''" >
+            AND  integral_approval.user_name like  concat(concat('%',#{search}),'%')
+        </if>
+        <if test="typeId != null and typeId !=''" >
+            AND  integral_approval.type_id = #{typeId}
+        </if>
+        <if test="deptIds != null and deptIds !=''" >
+            AND integral_approval.user_dept_id = #{deptIds}
+        </if>
+        <if test="postId != null and postId !=''" >
+            AND  integral_approval.user_post_id = #{postId}
+        </if>
+        <if test="spTime1 != null and spTime1 !=''" >
+            AND date_format(integral_approval.sp_time,'%Y%m%d%H%i%s')  <![CDATA[ >= ]]>  #{spTime1}
+        </if>
+        <if test="spTime2 != null and spTime2 !=''" >
+            AND date_format(integral_approval.sp_time,'%Y%m%d%H%i%s')  <![CDATA[ <= ]]>  #{spTime2}
+        </if>
+         and    date_format(integral_approval.sp_time,'%Y-%m')= date_format(now(),'%Y-%m')
+        GROUP BY sys_user.user_id  ORDER BY sum(integral_approval.sq_integral) DESC
+        ) as integral_approval,
+        (    SELECT    @rank := 0 ,@rownum := 0 ,@total := NULL    ) as t
+    </select>
+    <!-- 经理级审批 查询当季的数据 -->
+    <select id="selectManagerJiData" resultType="map" >
+        SELECT @rownum:=@rownum+1 AS rownum,IF(@total = amount ,@rank ,@rank :=@rownum) AS rank ,
+        @total := amount as total, integral_approval.*  FROM
+        (
+        select
+        sum(integral_approval.sq_integral) - sum(integral_approval.k_integral) + sys_user.ji_chu_integral as amount,
+        integral_approval.user_name as userName,
+        integral_approval.user_img as userImg,
+        sys_user.user_id as userId,
+        (sum(integral_approval.sq_integral) -  sum(integral_approval.k_integral)) as sqIntegral,
+        sum(integral_approval.k_integral) as deduce
+        from integral_approval,sys_user  where integral_approval.user_id = sys_user.user_id
+        AND sys_user.integral_status = 1
+        AND   integral_approval.status = 1  AND  sys_user.del_flag = 0
+        AND  sys_user.status = 0
+
+        <if test="search != null and search !=''" >
+            AND  integral_approval.user_name like  concat(concat('%',#{search}),'%')
+        </if>
+        <if test="typeId != null and typeId !=''" >
+            AND  integral_approval.type_id = #{typeId}
+        </if>
+        <if test="deptIds != null and deptIds !=''" >
+            AND integral_approval.user_dept_id = #{deptIds}
+        </if>
+        <if test="postId != null and postId !=''" >
+            AND  integral_approval.user_post_id = #{postId}
+        </if>
+        <if test="spTime1 != null and spTime1 !=''" >
+            AND date_format(integral_approval.sp_time,'%Y%m%d%H%i%s')  <![CDATA[ >= ]]>  #{spTime1}
+        </if>
+        <if test="spTime2 != null and spTime2 !=''" >
+            AND date_format(integral_approval.sp_time,'%Y%m%d%H%i%s')  <![CDATA[ <= ]]>  #{spTime2}
+        </if>
+        AND   QUARTER(integral_approval.sp_time)=QUARTER(now())
+        GROUP BY sys_user.user_id  ORDER BY sum(integral_approval.sq_integral) DESC
+        ) as integral_approval,
+        (    SELECT    @rank := 0 ,@rownum := 0 ,@total := NULL    ) as t
+    </select>
+    <!-- 经理级审批 查询本部门当年数据 -->
+    <select id="selectManagerYearData" resultType="map" >
+        SELECT @rownum:=@rownum+1 AS rownum,IF(@total = amount ,@rank ,@rank :=@rownum) AS rank ,
+        @total := amount as total, integral_approval.*  FROM
+        (
+        select
+        sum(integral_approval.sq_integral) - sum(integral_approval.k_integral) + sys_user.ji_chu_integral as amount,
+        integral_approval.user_name as userName,
+        integral_approval.user_img as userImg,
+        sys_user.user_id as userId,
+        (sum(integral_approval.sq_integral) -  sum(integral_approval.k_integral)) as sqIntegral,
+        sum(integral_approval.k_integral) as deduce
+        from integral_approval,sys_user  where integral_approval.user_id = sys_user.user_id
+        AND sys_user.integral_status = 1
+        AND   integral_approval.status = 1  AND  sys_user.del_flag = 0
+        AND  sys_user.status = 0
+        <if test="search != null and search !=''" >
+            AND  integral_approval.user_name like  concat(concat('%',#{search}),'%')
+        </if>
+        <if test="typeId != null and typeId !=''" >
+            AND  integral_approval.type_id = #{typeId}
+        </if>
+        <if test="deptIds != null and deptIds !=''" >
+            AND integral_approval.user_dept_id = #{deptIds}
+        </if>
+        <if test="postId != null and postId !=''" >
+            AND  integral_approval.user_post_id = #{postId}
+        </if>
+        <if test="spTime1 != null and spTime1 !=''" >
+            AND date_format(integral_approval.sp_time,'%Y%m%d%H%i%s')  <![CDATA[ >= ]]>  #{spTime1}
+        </if>
+        <if test="spTime2 != null and spTime2 !=''" >
+            AND date_format(integral_approval.sp_time,'%Y%m%d%H%i%s')  <![CDATA[ <= ]]>  #{spTime2}
+        </if>
+        AND   date_format(integral_approval.sp_time,'%Y') = year(now())
+        GROUP BY sys_user.user_id  ORDER BY sum(integral_approval.sq_integral) DESC
+        ) as integral_approval,
+        (    SELECT    @rank := 0 ,@rownum := 0 ,@total := NULL    ) as t
+    </select>
+    <!--总监级审批 查询本部门当日数据-->
+    <select id="selectDirectorDayData" resultType="map" >
+        SELECT @rownum:=@rownum+1 AS rownum,IF(@total = amount ,@rank ,@rank :=@rownum) AS rank ,
+        @total := amount as total, integral_approval.*  FROM
+        (
+        select
+        sum(integral_approval.sq_integral) - sum(integral_approval.k_integral) + sys_user.ji_chu_integral as amount,
+        integral_approval.user_name as userName,
+        integral_approval.user_img as userImg,
+        sys_user.user_id as userId,
+        (sum(integral_approval.sq_integral) -  sum(integral_approval.k_integral)) as sqIntegral,
+        sum(integral_approval.k_integral) as deduce
+        from integral_approval,sys_user  where integral_approval.user_id = sys_user.user_id
+        AND sys_user.integral_status = 1
+        AND   integral_approval.status = 1  AND  sys_user.del_flag = 0
+        AND  sys_user.status = 0
+        <if test="search != null and search !=''" >
+            AND  integral_approval.user_name like  concat(concat('%',#{search}),'%')
+        </if>
+        <if test="typeId != null and typeId !=''" >
+            AND  integral_approval.type_id = #{typeId}
+        </if>
+        <if test="deptIds != null and deptIds !=''" >
+            AND integral_approval.user_dept_id = #{deptIds}
+        </if>
+        <if test="postId != null and postId !=''" >
+            AND  integral_approval.user_post_id = #{postId}
+        </if>
+        <if test="spTime1 != null and spTime1 !=''" >
+            AND date_format(integral_approval.sp_time,'%Y%m%d%H%i%s')  <![CDATA[ >= ]]>  #{spTime1}
+        </if>
+        <if test="spTime2 != null and spTime2 !=''" >
+            AND date_format(integral_approval.sp_time,'%Y%m%d%H%i%s')  <![CDATA[ <= ]]>  #{spTime2}
+        </if>
+        AND   TO_DAYS(integral_approval.sp_time) =  TO_DAYS(NOW())
+        GROUP BY sys_user.user_id  ORDER BY sum(integral_approval.sq_integral) DESC
+        ) as integral_approval,
+        (    SELECT    @rank := 0 ,@rownum := 0 ,@total := NULL ) as t
+    </select>
+    <!-- 总监级审批 查询本部门当月数据 -->
+    <select id="selectDirectorMonthData" resultType="map" >
+        SELECT @rownum:=@rownum+1 AS rownum,IF(@total = amount ,@rank ,@rank :=@rownum) AS rank ,
+        @total := amount as total, integral_approval.*  FROM
+        (
+        select
+        sum(integral_approval.sq_integral) - sum(integral_approval.k_integral) + sys_user.ji_chu_integral as amount,
+        integral_approval.user_name as userName,
+        integral_approval.user_img as userImg,
+        sys_user.user_id as userId,
+        (sum(integral_approval.sq_integral) -  sum(integral_approval.k_integral)) as sqIntegral,
+        sum(integral_approval.k_integral) as deduce
+        from integral_approval,sys_user  where integral_approval.user_id = sys_user.user_id
+        AND sys_user.integral_status = 1
+        AND   integral_approval.status = 1  AND  sys_user.del_flag = 0
+        AND  sys_user.status = 0
+        <if test="search != null and search !=''" >
+            AND  integral_approval.user_name like  concat(concat('%',#{search}),'%')
+        </if>
+        <if test="typeId != null and typeId !=''" >
+            AND  integral_approval.type_id = #{typeId}
+        </if>
+        <if test="deptIds != null and deptIds !=''" >
+            AND integral_approval.user_dept_id = #{deptIds}
+        </if>
+        <if test="postId != null and postId !=''" >
+            AND  integral_approval.user_post_id = #{postId}
+        </if>
+        <if test="spTime1 != null and spTime1 !=''" >
+            AND date_format(integral_approval.sp_time,'%Y%m%d%H%i%s')  <![CDATA[ >= ]]>  #{spTime1}
+        </if>
+        <if test="spTime2 != null and spTime2 !=''" >
+            AND date_format(integral_approval.sp_time,'%Y%m%d%H%i%s')  <![CDATA[ <= ]]>  #{spTime2}
+        </if>
+        and    date_format(integral_approval.sp_time,'%Y-%m')= date_format(now(),'%Y-%m')
+        GROUP BY sys_user.user_id  ORDER BY sum(integral_approval.sq_integral) DESC
+        ) as integral_approval,
+        (    SELECT    @rank := 0 ,@rownum := 0 ,@total := NULL    ) as t
+    </select>
+    <!-- 总监级审批 查询本部门当季数据  -->
+    <select id="selectDirectorJiData" resultType="map" >
+        SELECT @rownum:=@rownum+1 AS rownum,IF(@total = amount ,@rank ,@rank :=@rownum) AS rank ,
+        @total := amount as total, integral_approval.*  FROM
+        (
+        select
+        sum(integral_approval.sq_integral) - sum(integral_approval.k_integral) + sys_user.ji_chu_integral as amount,
+        integral_approval.user_name as userName,
+        integral_approval.user_img as userImg,
+        sys_user.user_id as userId,
+        (sum(integral_approval.sq_integral) -  sum(integral_approval.k_integral)) as sqIntegral,
+        sum(integral_approval.k_integral) as deduce
+        from integral_approval,sys_user  where integral_approval.user_id = sys_user.user_id
+        AND sys_user.integral_status = 1
+        AND   integral_approval.status = 1  AND  sys_user.del_flag = 0
+        AND  sys_user.status = 0
+        <if test="search != null and search !=''" >
+            AND  integral_approval.user_name like  concat(concat('%',#{search}),'%')
+        </if>
+        <if test="typeId != null and typeId !=''" >
+            AND  integral_approval.type_id = #{typeId}
+        </if>
+        <if test="deptIds != null and deptIds !=''" >
+            AND integral_approval.user_dept_id = #{deptIds}
+        </if>
+        <if test="postId != null and postId !=''" >
+            AND  integral_approval.user_post_id = #{postId}
+        </if>
+        <if test="spTime1 != null and spTime1 !=''" >
+            AND date_format(integral_approval.sp_time,'%Y%m%d%H%i%s')  <![CDATA[ >= ]]>  #{spTime1}
+        </if>
+        <if test="spTime2 != null and spTime2 !=''" >
+            AND date_format(integral_approval.sp_time,'%Y%m%d%H%i%s')  <![CDATA[ <= ]]>  #{spTime2}
+        </if>
+        AND   QUARTER(integral_approval.sp_time) = QUARTER(now())
+        GROUP BY sys_user.user_id  ORDER BY sum(integral_approval.sq_integral) DESC
+        ) as integral_approval,
+        (    SELECT    @rank := 0 ,@rownum := 0 ,@total := NULL    ) as t
+    </select>
+    <!-- 总监级审批 查询本部门当月数据 -->
+    <select id="selectDirectorYearData" resultType="map" >
+        SELECT @rownum:=@rownum+1 AS rownum,IF(@total = amount ,@rank ,@rank :=@rownum) AS rank ,
+        @total := amount as total, integral_approval.*  FROM
+        (
+        select
+        sum(integral_approval.sq_integral) - sum(integral_approval.k_integral) + sys_user.ji_chu_integral as amount,
+        integral_approval.user_name as userName,
+        integral_approval.user_img as userImg,
+        sys_user.user_id as userId,
+        (sum(integral_approval.sq_integral) -  sum(integral_approval.k_integral)) as sqIntegral,
+        sum(integral_approval.k_integral) as deduce
+        from integral_approval,sys_user  where integral_approval.user_id = sys_user.user_id
+        AND sys_user.integral_status = 1
+        AND   integral_approval.status = 1  AND  sys_user.del_flag = 0
+        AND  sys_user.status = 0
+        <if test="search != null and search !=''" >
+            AND  integral_approval.user_name like  concat(concat('%',#{search}),'%')
+        </if>
+        <if test="typeId != null and typeId !=''" >
+            AND  integral_approval.type_id = #{typeId}
+        </if>
+        <if test="deptIds != null and deptIds !=''" >
+            AND integral_approval.user_dept_id = #{deptIds}
+        </if>
+        <if test="postId != null and postId !=''" >
+            AND  integral_approval.user_post_id = #{postId}
+        </if>
+        <if test="spTime1 != null and spTime1 !=''" >
+            AND date_format(integral_approval.sp_time,'%Y%m%d%H%i%s')  <![CDATA[ >= ]]>  #{spTime1}
+        </if>
+        <if test="spTime2 != null and spTime2 !=''" >
+            AND date_format(integral_approval.sp_time,'%Y%m%d%H%i%s')  <![CDATA[ <= ]]>  #{spTime2}
+        </if>
+        AND   date_format(integral_approval.sp_time,'%Y') = year(now())
+        GROUP BY sys_user.user_id  ORDER BY sum(integral_approval.sq_integral) DESC
+        ) as integral_approval,
+        (    SELECT    @rank := 0 ,@rownum := 0 ,@total := NULL    ) as t
+    </select>
+    <!-- 统计总积分 -->
+    <select id="selectCountIntegral" resultType="Long" >
+        SELECT
+        (IFNULL(SUM(integral_approval.sq_integral),0)+ sys_user.ji_chu_integral) - IFNULL(SUM(integral_approval.k_integral),0)
+        FROM integral_approval,sys_user
+        where integral_approval.user_id = sys_user.user_id
+        and
+         integral_approval.user_id= #{userId}
+         and integral_approval.status =1 ;
+
+    </select>
+    <!--个人中心Echarts显示数量-->
+    <select id="selectAddAndCountDelIntegral" resultType="map" >
+       select (sum(integral_approval.sq_integral)- SUM(integral_approval.k_integral) + sys_user.ji_chu_integral) as countIntegral
+        , SUM(integral_approval.k_integral) as delIntegral ,
+        sum(integral_approval.sq_integral)- SUM(integral_approval.k_integral) as addIntegral,
+        sys_user.ji_chu_integral AS baseIntegral
+        FROM integral_approval,sys_user  where integral_approval.user_id = sys_user.user_id
+        <if test="userId !=null and userId !=''" >
+            and   integral_approval.user_id =#{userId}
+        </if>
+         and integral_approval.status = 1
+    </select>
+
+
+    <insert id="addxinxi" parameterType="com.msj.goods.entity.IntegralApproval" >
+        insert into integral_approval
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="num != null  ">sq_integral,</if>
+            <if test="Phone != null  ">user_phone,</if>
+            <if test="shenPiRenIds != null  ">shen_pi_ren_ids,</if>
+            <if test="tiJiaoRenIds != null   ">ti_jiao_ren_ids,</if>
+            <if test="tiJiaoId != null  ">ti_jiao_id,</if>
+            <if test="status != null  ">status,</if>
+            <if test="integralTypeId != null  ">integral_type_id,</if>
+            <if test="userName != null  and userName != ''  ">user_name,</if>
+            <if test="userDeptId != null   ">user_dept_id,</if>
+            <if test="userId != null   ">user_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="num != null  ">#{num},</if>
+            <if test="Phone != null  ">#{Phone},</if>
+            <if test="shenPiRenIds != null  ">#{shenPiRenIds},</if>
+            <if test="tiJiaoRenIds != null  ">#{tiJiaoRenIds},</if>
+            <if test="tiJiaoId != null  ">#{tiJiaoId},</if>
+            <if test="status != null  ">#{status},</if>
+            <if test="integralTypeId != null  ">#{integralTypeId},</if>
+            <if test="userName != null  and userName != ''  ">#{userName},</if>
+            <if test="userDeptId != null  ">#{userDeptId},</if>
+            <if test="userId != null  ">#{userId},</if>
+        </trim>
+
+    </insert>
+
+    <select id="selectgly"  resultMap="BaseResultMap">
+          select integral_approval.*
+          from  integral_approval where  shen_pi_ren_ids = #{tiJiaoId}
+           and  integral_type_id=4
+    </select>
+    <!-- 通过用户 审批日志  -->
+    <select id="selectCountNum" resultType="Integer" >
+            SELECT
+            count(1)
+            FROM
+                integral_approval
+            WHERE
+            integral_approval.status = 0
+            <if test="userId !=null" >
+                and integral_approval.user_id = #{userId}
+            </if>
+    </select>
+
+
+</mapper>

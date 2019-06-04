@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msj.goods.mapper.SysUserDeptPostMapper">
+    
+    <resultMap type="com.msj.goods.entity.SysUserDeptPost" id="BaseResultMap">
+        <result property="udId"    column="ud_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+	
+	<sql id="selectSysUserDeptPostVo">
+        select ud_id, user_id, dept_id, create_time, update_time from sys_user_dept_post
+    </sql>
+
+    <select id="findSysUserDeptPost" resultType="com.msj.goods.entity.SysUserDeptPost">
+            SELECT DISTINCT
+                a.user_id userId
+            FROM
+                sys_user_dept_post a;
+    </select>
+
+    <select id="findSudpByUserId" resultType="com.msj.goods.entity.SysUserDeptPost">
+            SELECT
+                a.dept_id deptId
+            FROM
+                sys_user_dept_post a
+            WHERE a.user_id = #{userId};
+    </select>
+
+
+    <select id="findSudpByUserId2" parameterType="SysUserDeptPost">
+        SELECT COUNT(*) FROM  sys_user_dept_post,sys_user,sys_user_post
+        WHERE sys_user_dept_post.dept_id=sys_user.dept_id
+        AND sys_user_post.user_id=sys_user.user_id
+        AND sys_user_dept_post.user_id=#{userId}
+        AND sys_user_post.post_id &lt; 5
+    </select>
+
+
+    <select id="findSudpByUserId3" parameterType="SysUserDeptPost">
+        SELECT COUNT(*) FROM  sys_user_dept_post,sys_user,sys_user_post
+        WHERE sys_user_dept_post.dept_id=sys_user.dept_id
+        AND sys_user_post.user_id=sys_user.user_id
+        AND sys_user_dept_post.user_id=#{userId}
+        AND sys_user_post.post_id  &gt;  5
+    </select>
+
+
+    <select id="selectDeptIdUserId" resultType="com.msj.goods.entity.SysUserDeptPost" >
+        <include refid="selectSysUserDeptPostVo" />
+        <where>
+            <if test="deptId !=null">
+               and dept_id = #{deptId}
+            </if>
+        </where>
+
+    </select>
+</mapper>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msj.goods.mapper.LevelTitleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.msj.goods.entity.LevelTitle">
+        <id column="t_id" property="tId" />
+        <result column="t_name" property="tName" />
+        <result column="t_integral" property="tIntegral" />
+        <result column="t_a" property="tA" />
+        <result column="t_b" property="tB" />
+        <result column="t_c" property="tC" />
+        <result column="t_d" property="tD" />
+        <result column="t_end" property="tEnd" />
+        <result column="level_id" property="levelId" />
+        <result column="catab_time" property="catabTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        t_id, t_name, t_integral, t_a, t_b, t_c, t_d, t_end, level_id, catab_time
+    </sql>
+
+
+    <select id="selecttitle" resultMap="BaseResultMap" >
+
+        select  t_id, t_name, t_integral, t_a, t_b, t_c, t_d, t_end, level_id, catab_time
+         from level_title where level_id = #{levelId}
+    </select>
+
+    <select id="leveltitleku" resultMap="BaseResultMap" >
+
+        select  t_id, t_name, t_integral, t_a, t_b, t_c, t_d, t_end, level_id, catab_time
+         from level_title where t_id = #{tId}
+    </select>
+
+
+
+</mapper>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msj.goods.mapper.IntegralJkMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.msj.goods.entity.IntegralJk">
+        <id column="jk_id" property="jkId" />
+        <result column="jk_num" property="jkNum" />
+        <result column="jk_title" property="jkTitle" />
+        <result column="jk_name" property="jkName" />
+        <result column="jk_phone" property="jkPhone" />
+        <result column="dept_id" property="deptId" />
+        <result column="dept_name" property="deptName" />
+        <result column="jk_img" property="jkImg" />
+        <result column="j_integral" property="jIntegral" />
+        <result column="k_integral" property="kIntegral" />
+        <result column="jk_time" property="jkTime" />
+        <result column="jk_describe" property="jkDescribe" />
+        <result column="status" property="status" />
+        <result column="remark" property="remark" />
+        <result column="type_id" property="typeId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        jk_id, jk_num, jk_title, jk_name, jk_phone, dept_id, dept_name, jk_img, j_integral, k_integral, jk_time, jk_describe, status, remark, type_id
+    </sql>
+</mapper>

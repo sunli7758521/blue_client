@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msj.goods.mapper.GzdMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.msj.goods.entity.Gzd">
+        <id column="gzt_id" property="gztId"/>
+        <result column="yy_img" property="yyImg"/>
+        <result column="yy_title" property="yyTitle"/>
+        <result column="yy_type" property="yyType"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+        <result property="sort" column="sort"/>
+        <result property="lotteryStatus" column="lottery_status"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        gzt_id, yy_img, yy_title, yy_type, status, create_time, update_time, remark, sort, lottery_status
+    </sql>
+
+</mapper>

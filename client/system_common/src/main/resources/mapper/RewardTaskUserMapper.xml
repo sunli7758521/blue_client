@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.msj.goods.mapper.RewardTaskUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.msj.goods.entity.RewardTaskUser">
+        <id column="rtu_id" property="rtuId" />
+        <result column="rt_id" property="rtId" />
+        <result column="user_id" property="userId" />
+        <result column="state" property="state" />
+        <result column="create_date" property="createDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        rtu_id, rt_id, user_id, state, create_date
+    </sql>
+    <!--根据任务id查询所关联的用户-->
+    <select id="selectRTUList" resultType="com.msj.goods.entity.TaskUserList" >
+        select
+        reward_task_user.rtu_id as rtuId,
+        reward_task_user.rt_id as rewardTaskId,
+        reward_task_user.user_id as userId,
+        reward_task_user.state as state,
+        reward_task_user.create_date as createDate,
+		sys_user.user_name as userName
+        FROM reward_task_user,sys_user
+        where reward_task_user.user_id = sys_user.user_id and
+        reward_task_user.rt_id = #{rtId}
+    </select>
+</mapper>
